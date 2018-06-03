@@ -1,7 +1,6 @@
 package br.com.rodolfo;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -12,17 +11,13 @@ import java.sql.Statement;
 public class TesteConexao {
 
     public static void main(String[] args) throws SQLException, ClassNotFoundException {
+		
+		//Refatoração da classe
+		Connection connection = DataBase.getConnection();
 
-        //Necessário para 'mysql-connector' maior que a versão 6.0'
-		//Class.forName("com.mysql.cj.jdbc.Driver");
-		final String BD_URL = "jdbc:mysql://127.0.0.1/lista?useTimezone=true&serverTimezone=UTC&useSSL=false";
-		
-		//gerenciador de conexão escolhe qual estratégia adequada para a comunicação com o banco de dados
-		Connection connection = DriverManager.getConnection(BD_URL, "root", "root");
-		
 		//Necessário criar um Statement para realizar a execução SQL
 		Statement stmt = connection.createStatement();
-		//Caso a SQL executada traga um conjunto de resultados então será TRUE
+		//Caso a SQL executada traga um conjunto de resultados (SELECT) então será TRUE caso contrário é FALSE (INSERT, DELETE)
 		boolean result = stmt.execute("select * from produtos");
 		System.out.println("O resultado foi : " + result);
 		
@@ -48,8 +43,5 @@ public class TesteConexao {
 		
 		//Todda conexão deve ser fechada
 		connection.close();
-
-
-
     }
 }
