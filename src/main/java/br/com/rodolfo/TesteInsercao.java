@@ -18,26 +18,55 @@ public class TesteInsercao {
         String nome2 = "Monitor";
         String desc2 = "Monitor 22'";
 
-        Connection connection = DataBase.getConnection();
+        //Responsabiliza o JAVA para abrir a conexão e fecha-la quando bloco do TRY terminar, evitando a preocupação do programador em fechar o STATEMENT quando o bloco terminar com ou sem ERROR
+        try(Connection connection = DataBase.getConnection()) {
 
-        //Criado um statement de preparação logo abaixo
-        //Statement statement = connection.createStatement();
+            //Desativar o auto commit
+            connection.setAutoCommit(false);
 
-        //Cria-se a query e os parâmetros do value serão preparadaos
-        String sql = "INSERT INTO produtos (nome, descricao) VALUES (?, ?),(?, ?)";
+            //Criado um statement de preparação logo abaixo
+            //Statement statement = connection.createStatement();
 
-        //Cria-se uma sql preparada para receber parâmetros a serem 'escapados' scpae
-        PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            //Cria-se a query e os parâmetros do value serão preparadaos
+            String sql = "INSERT INTO produtos (nome, descricao) VALUES (?, ?)";
+
+            //Cria-se uma sql preparada para receber parâmetros a serem 'escapados' scpae. Responsabiliza o JAVA para criar o STATEMENT e fecha-lo ao termino do bloco TRY evitando a preocupação do programador em fechar o STATEMENT quando o bloco terminar com ou sem ERROR
+            try (PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)){
+
+                //Para recuperar o ID da inserção realizada passamos um segundo argumento 'RETURN_GENERATED_KEYS' no 'execute'
+                //boolean result = statement.execute("INSERT INTO produtos (nome, descricao) VALUES ('Monitor', 'Monitor 21p'), ('Lampada', 'Lampada de LED')", Statement.RETURN_GENERATED_KEYS);
+
+                adiciona(nome1, desc1, statement);
+                adiciona(nome2, desc2, statement);
+
+                //realizar o commit do primeiro produto
+                connection.commit();
+
+            } catch (Exception e) {
+                
+                e.printStackTrace();
+                connection.rollback();
+                System.out.println("Rollback efetuado");
+            }
+        }
+
+        //Podemos remover o close porque o TRY da conexão ao ser terminado o JAVA é inteligente para fechar a conexão, evitando a preocupação do programador em fechar a conexão.
+        //connection.close();
+
+    }
+
+    public static void adiciona(String nome, String desc, PreparedStatement statement) throws SQLException {
+        
+        //Ocasionar um erro para não realizar commit no banco caso acontece erro de alguma inserção
+        if(nome.equals("Monitor")) {
+
+            throw new IllegalArgumentException("Problema ocorrido");
+        }
+
         //Setar os parâmetros
-        statement.setString(1, nome1);
-        statement.setString(2, desc1);
-        statement.setString(3, nome2);
-        statement.setString(4, desc2);
+        statement.setString(1, nome);
+        statement.setString(2, desc);
 
-
-        //Para recuperar o ID da inserção realizada passamos um segundo argumento 'RETURN_GENERATED_KEYS' no 'execute'
-        //boolean result = statement.execute("INSERT INTO produtos (nome, descricao) VALUES ('Monitor', 'Monitor 21p'), ('Lampada', 'Lampada de LED')", Statement.RETURN_GENERATED_KEYS);
-         
         //A sql já foi preparada, agora só é necessário executa-la
         boolean result = statement.execute();
 
@@ -51,8 +80,6 @@ public class TesteInsercao {
         }
 
         resultSet.close();
-        statement.close();
-        connection.close();
-
     }
+
 }

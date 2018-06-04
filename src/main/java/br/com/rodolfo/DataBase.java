@@ -18,7 +18,7 @@ public class DataBase {
 		
 		//gerenciador de conexão escolhe qual estratégia adequada para a comunicação com o banco de dados
 		//Connection connection = DriverManager.getConnection(BD_URL, "root", "root");
-		Connection connection = DriverManager.getConnection(BD_URL, "root", "");
+        Connection connection = DriverManager.getConnection(BD_URL, "root", "");
 
         return connection;
     }
