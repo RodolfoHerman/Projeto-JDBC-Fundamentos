@@ -19,7 +19,7 @@ public class TesteInsercao {
         String desc2 = "Monitor 22'";
 
         //Responsabiliza o JAVA para abrir a conexão e fecha-la quando bloco do TRY terminar, evitando a preocupação do programador em fechar o STATEMENT quando o bloco terminar com ou sem ERROR
-        try(Connection connection = DataBase.getConnection()) {
+        try(Connection connection = new ConnectionPool().getConnection()) {
 
             //Desativar o auto commit
             connection.setAutoCommit(false);
