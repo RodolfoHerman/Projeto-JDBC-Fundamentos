@@ -8,6 +8,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import br.com.rodolfo.modelo.Categoria;
 import br.com.rodolfo.modelo.Produto;
 
 /**
@@ -53,21 +54,45 @@ public class ProdutoDAO {
 
         try(PreparedStatement statement = this.con.prepareStatement(sql)) {
 
-            statement.execute();
-            
-            try(ResultSet result = statement.getResultSet()){
-
-                while(result.next()) {
-
-                    Integer id  = result.getInt("id");
-                    String nome = result.getString("nome");
-                    String desc = result.getString("descricao");
-
-                    produtos.add(new Produto(id, nome, desc));
-                }
-            }
+            resultadoEmProdutos(statement, produtos);
         }
 
         return produtos;
     }
+
+
+    public List<Produto> busca(Categoria categoria) throws SQLException {
+        
+        String sql = "SELECT * FROM produtos WHERE id_categoria = ? ";
+        List<Produto> produtos = new ArrayList<>();
+
+        try(PreparedStatement statement = this.con.prepareStatement(sql)) {
+
+            statement.setInt(1, categoria.getId());
+        
+            resultadoEmProdutos(statement, produtos);        
+        }
+
+        return produtos;
+    }
+
+
+    private void resultadoEmProdutos(PreparedStatement statement, List<Produto> produtos) throws SQLException {
+
+        statement.execute();
+
+        try(ResultSet result = statement.getResultSet()) {
+
+            while (result.next()) {
+                
+                Integer id = result.getInt("id");
+                String nome = result.getString("nome");
+                String desc = result.getString("descricao");
+
+                produtos.add(new Produto(id, nome, desc));
+            }
+        }
+    }
+
+
 }

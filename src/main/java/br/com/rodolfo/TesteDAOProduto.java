@@ -21,7 +21,7 @@ public class TesteDAOProduto {
             ProdutoDAO produtoDAO = new ProdutoDAO(connection);
             
             //utilizar o DAO para salvar o produto
-            System.out.println(produtoDAO.salvar(produto));
+            //System.out.println(produtoDAO.salvar(produto));
 
             //Utilizar o DAO para listar os produtos
             for (Produto prod : produtoDAO.listar()) {
